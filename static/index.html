@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyTracer | Autonomous Flight Intelligence Agent</title>
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Canvas background for animated particle network -->
+    <canvas id="particle-canvas" class="particle-canvas"></canvas>
+    <div class="glass-bg"></div>
+
+    <!-- 1. NAVIGATION BAR -->
+    <header class="topnav">
+        <div class="topnav__brand" id="logo-home">
+            <span class="topnav__logo">✈️</span>
+            <span class="topnav__wordmark">SKYTRACER</span>
+            <span class="topnav__version">v2.1</span>
+        </div>
+        
+        <div class="topnav__actions">
+            <div class="topnav__status">
+                <span class="status-dot online"></span>
+                <span class="status-label">Agent Active</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+        <nav class="sidebar__nav">
+            <div class="sidebar__section">
+                <span class="sidebar__section-label">Core Services</span>
+                
+                <button class="sidebar__link active nav-link-btn" data-view="landing">
+                    <span class="sidebar__icon">🏠</span>
+                    <span class="sidebar__label">Home</span>
+                </button>
+                
+                <button class="sidebar__link nav-link-btn" data-view="search">
+                    <span class="sidebar__icon">🔍</span>
+                    <span class="sidebar__label">Smart Search</span>
+                </button>
+                
+                <button class="sidebar__link nav-link-btn" data-view="analytics">
+                    <span class="sidebar__icon">📊</span>
+                    <span class="sidebar__label">Analytics</span>
+                </button>
+                
+                <button class="sidebar__link nav-link-btn" data-view="alerts">
+                    <span class="sidebar__icon">🔔</span>
+                    <span class="sidebar__label">Alerts</span>
+                </button>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- 3. MAIN CONTENT AREA -->
+    <main class="main-content">
+        <!-- LANDING VIEW CONTAINER (Concise Home View) -->
+        <div id="view-landing" class="view-panel active">
+            <!-- HERO SECTION -->
+            <header id="hero" class="hero-section">
+                <div class="hero-content">
+                    <div class="badge-new">
+                        <span class="badge-pulse"></span>
+                        v2.0-Production Ready
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="typewriter-line">ZERO CREDENTIALS.</span><br>
+                        <span class="typewriter-line gradient-text">PREDICTIVE TRENDS.</span><br>
+                        <span class="typewriter-line">AUTONOMOUS FLIGHTS.</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        An intelligent, self-hosted aerospace flight scouting agent that runs local scans, bypasses price tracking traps, and charts historical price models.
+                    </p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" id="btn-hero-launch">Launch Agent</button>
+                        <button class="btn btn-secondary" id="btn-hero-learn">Learn More</button>
+                    </div>
+                </div>
+
+                <!-- Fake live terminal simulation -->
+                <div class="hero-terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-actions">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="terminal-title">skytracer@agent-feed:~</span>
+                    </div>
+                    <div class="terminal-body" id="hero-terminal-output">
+                        <span class="term-line">> Initializing SkyTracer agent connection...</span>
+                        <span class="term-line text-emerald">> Connection established. Database active.</span>
+                        <span class="term-line">> Starting cron monitor: checking active alerts...</span>
+                        <span class="term-line text-cyan">> Scanning LKO → IXL (Leh) via Protobuf client...</span>
+                        <span class="term-line text-gold">> ALERT: Price dropped below threshold for LKO → GOI!</span>
+                        <span class="term-line text-emerald">> Saved record #1,208 to local history database.</span>
+                        <span class="term-line cursor-line">> Ready for user input...█</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- STATS STRIP BANNER -->
+            <section class="stats-banner">
+                <div class="stat-item">
+                    <span class="stat-icon-wrap">🔒</span>
+                    <div class="stat-text-block">
+                        <h4 class="stat-number">100%</h4>
+                        <p class="stat-desc">Zero API Keys Required</p>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-icon-wrap">📊</span>
+                    <div class="stat-text-block">
+                        <h4 class="stat-number" id="stats-price-count">598+</h4>
+                        <p class="stat-desc">Prices Tracked Locally</p>
+                    </div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-icon-wrap">⚡</span>
+                    <div class="stat-text-block">
+                        <h4 class="stat-number">&lt; 1.5s</h4>
+                        <p class="stat-desc">Protobuf Request Response</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LIVE METRICS GRID -->
+            <section class="live-metrics-section" style="max-width: 1100px; margin: 0 auto var(--space-8); padding: 0 var(--space-4);">
+                <h3 style="font-family: var(--font-display); font-size: 1.5rem; margin-bottom: var(--space-4); display: flex; align-items: center; gap: 8px;">
+                    📊 Live Database Summary
+                </h3>
+                <div class="live-metrics-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5);">
+                    <div class="glass-card" style="display: flex; align-items: center; gap: var(--space-4);">
+                        <span style="font-size: 2rem;">🌍</span>
+                        <div>
+                            <h4 class="stat-number" id="stat-routes-count" style="font-family: var(--font-display); font-size: 1.75rem; color: var(--cyan-500); font-weight: 700;">0</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Routes Tracked</p>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="display: flex; align-items: center; gap: var(--space-4);">
+                        <span style="font-size: 2rem;">💎</span>
+                        <div>
+                            <h4 class="stat-number" id="stat-best-deal" style="font-family: var(--font-display); font-size: 1.75rem; color: var(--success); font-weight: 700;">₹--</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Best Deal Available</p>
+                        </div>
+                    </div>
+                    <div class="glass-card" style="display: flex; align-items: center; gap: var(--space-4);">
+                        <span style="font-size: 2rem;">🔔</span>
+                        <div>
+                            <h4 class="stat-number" id="stat-active-alerts" style="font-family: var(--font-display); font-size: 1.75rem; color: var(--violet-400); font-weight: 700;">0</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary);">Active Alerts Set</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dynamic Modal for Features Info (Opens only when clicked) -->
+            <div id="learn-more-modal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>SkyTracer Features & Pipeline</h3>
+                        <button class="modal-close" id="btn-close-modal">×</button>
+                    </div>
+                    <div class="modal-body-scroll">
+                        <div class="features-wrapper" style="border: none; padding: 0;">
+                            <div class="features-tabs">
+                                <button class="feature-tab-btn active" data-feature="explore">🌍 Explore</button>
+                                <button class="feature-tab-btn" data-feature="filters">🔍 Filters</button>
+                                <button class="feature-tab-btn" data-feature="grid">📅 Date Grid</button>
+                            </div>
+                            <div class="feature-content-container" style="margin-top: 15px;">
+                                <div class="feature-panel active" id="feat-explore">
+                                    <p><strong>Multi-Dimensional Dest Explore</strong>: Scans dozens of destination routes in parallel over variable trip durations (e.g. 5, 7, or 10 days) using mid-date averages.</p>
+                                </div>
+                                <div class="feature-panel" id="feat-filters">
+                                    <p><strong>Quality Gates & Layover Guards</strong>: Excludes ultra-low cost carriers (ULCC) and layovers under 45m or over 6h to protect your booking quality.</p>
+                                </div>
+                                <div class="feature-panel" id="feat-grid">
+                                    <p><strong>Calendar Price Matrix</strong>: Generates pricing heatmaps comparing departure vs return combinations to spot pricing anomalies.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 25px 0;">
+                        
+                        <h4 style="margin-bottom: 12px; font-family: var(--font-display);">System Pipeline</h4>
+                        <div class="flow-nodes-grid" style="grid-template-columns: 1fr; gap: 15px;">
+                            <div class="flow-card">
+                                <span class="flow-num">01. UI Forms</span>
+                                <p>Inputs specified on the dashboard trigger the scan.</p>
+                            </div>
+                            <div class="flow-card">
+                                <span class="flow-num">02. Scraper Engine</span>
+                                <p>Scrapes rates anonymously via Protobuf queries.</p>
+                            </div>
+                            <div class="flow-card">
+                                <span class="flow-num">03. Local storage</span>
+                                <p>Stores detailed records inside local SQLite files.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WORKSPACE VIEW CONTAINER (Hides on Home / Opens when tab selected) -->
+        <div id="view-workspace" class="view-panel">
+            
+            <!-- Tab Content: Smart Search -->
+            <section id="work-search" class="workspace-tab-content">
+                <div class="glass-card">
+                    <div style="margin-bottom: var(--space-4);">
+                        <h3 style="font-family: var(--font-display); font-size: 1.5rem;">Run Flight Scan</h3>
+                        <p class="subtitle" style="color: var(--text-secondary); font-size: 0.875rem;">Query Google Flights credential-free and log results directly to your local database.</p>
+                    </div>
+
+                    <!-- Strategy Selection Tabs inside Workspace -->
+                    <div class="search-tabs">
+                        <button type="button" class="search-tab-btn" data-strategy="explore">🌍 Strategy 1: Explore</button>
+                        <button type="button" class="search-tab-btn active" data-strategy="search">🔍 Strategy 2: Smart Search</button>
+                        <button type="button" class="search-tab-btn" data-strategy="dates">📅 Strategy 3: Date Grid</button>
+                        <button type="button" class="search-tab-btn" data-strategy="flexible">⚡ Strategy 4: Flexible Search</button>
+                    </div>
+
+                    <form id="search-form" class="search-form-grid">
+                        <input type="hidden" id="search-strategy" value="search">
+                        <div class="form-group">
+                            <label class="input-label" for="search-origin">Origin Airport</label>
+                            <div class="airport-field-wrapper">
+                                <input type="text" id="search-origin" class="form-input" placeholder="Type city or airport code..." required value="LKO" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group" id="destination-field-wrapper">
+                            <label class="input-label" for="search-dest">Destination Airport</label>
+                            <div class="airport-field-wrapper">
+                                <input type="text" id="search-dest" class="form-input" placeholder="Type city or airport code..." required value="GOI" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label" for="search-dates">Dates / Range</label>
+                            <input type="text" id="search-dates" class="form-input" placeholder="e.g., 2026-07 or 2026-07-01 to 2026-07-15" required value="2026-06-15 to 2026-06-25">
+                            <small class="form-help">Supports Month ("2026-07"), date range ("YYYY-MM-DD to YYYY-MM-DD"), or "next_month".</small>
+                        </div>
+                        <div class="form-group" id="search-duration-wrapper">
+                            <label class="input-label" for="search-duration">Trip Duration(s) (Days)</label>
+                            <input type="text" id="search-duration" class="form-input" value="7" placeholder="e.g., 7 or 5,7,10">
+                            <small class="form-help">Supports single integer or comma-separated list of integers (e.g. "5,7,10").</small>
+                        </div>
+                        <div class="form-group" id="flexible-duration-wrapper" style="display: none;">
+                            <label class="input-label">Flexible Duration Range (Days)</label>
+                            <div class="form-row">
+                                <input type="number" id="search-min-days" class="form-input" placeholder="Min" value="5">
+                                <input type="number" id="search-max-days" class="form-input" placeholder="Max" value="10">
+                            </div>
+                        </div>
+                        <div class="form-group" id="budget-field-wrapper" style="display: none;">
+                            <label class="input-label" for="search-budget">Max Budget (INR)</label>
+                            <input type="number" id="search-budget" class="form-input" placeholder="e.g. 20000">
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label" for="search-cabin">Cabin Class</label>
+                            <select id="search-cabin" class="form-input">
+                                <option value="ECONOMY" selected>Economy</option>
+                                <option value="PREMIUM_ECONOMY">Premium Economy</option>
+                                <option value="BUSINESS">Business</option>
+                                <option value="FIRST">First</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label" for="search-stops">Max Stops</label>
+                            <select id="search-stops" class="form-input">
+                                <option value="ANY" selected>Any Stops</option>
+                                <option value="ZERO">Non-stop</option>
+                                <option value="ONE">Max 1 Stop</option>
+                                <option value="TWO">Max 2 Stops</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label" for="search-adults">Adults</label>
+                            <input type="number" id="search-adults" class="form-input" value="1" min="1" max="9" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="input-label" for="search-sort">Sort Results By</label>
+                            <select id="search-sort" class="form-input">
+                                <option value="score" selected>Value Score</option>
+                                <option value="price">Cheapest Price</option>
+                                <option value="duration">Shortest Duration</option>
+                            </select>
+                        </div>
+                        <div class="form-group span-all" id="nearby-field-wrapper" style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
+                            <input type="checkbox" id="search-nearby" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--cyan-500);">
+                            <label for="search-nearby" style="cursor: pointer; font-size: 13px; color: var(--text-secondary);">Include Nearby Airport Savings (DEL, BOM, BLR, LKO, LHR etc.)</label>
+                        </div>
+                        <div class="form-group span-all" style="display: flex; gap: 15px; margin-top: 10px;">
+                            <button type="submit" class="btn btn-primary" id="btn-submit-search">
+                                🚀 Start Flight Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Active Tasks / Log Output -->
+                    <div class="console-card" id="task-monitor-card" style="display: none; margin-top: 24px; padding: 20px; border-radius: var(--radius-lg);">
+                        <div class="console-header">
+                            <div class="console-title">
+                                <span class="status-dot pulse yellow" id="task-status-dot"></span>
+                                <span id="task-status-text">Task Status: Pending</span>
+                            </div>
+                            <button class="btn-close" id="btn-close-console">×</button>
+                        </div>
+                        <div class="console-log" id="console-log-output">
+                            <!-- Live log text goes here -->
+                        </div>
+                    </div>
+
+                    <!-- Search Results Card -->
+                    <div class="table-card" id="search-results-card" style="display: none; margin-top: 24px;">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <div>
+                                <h3 style="font-family: var(--font-display); font-size: 1.25rem;">Quality Flight Deals Found</h3>
+                                <p class="subtitle" style="color: var(--text-secondary); font-size: 0.8rem;">Cheapest filtered flights matching your criteria.</p>
+                            </div>
+                            <span class="sidebar__badge" id="results-count-badge" style="background: rgba(0,212,255,0.1); color: var(--cyan-500);">0 flights</span>
+                        </div>
+
+                        <!-- Alternate Airport Savings Widget -->
+                        <div id="nearby-savings-container" style="display: none; margin-bottom: 20px; padding: 18px; border-radius: 12px; background: rgba(0, 212, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.2);">
+                            <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; color: var(--cyan-500); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                                💡 Nearby Airport Savings Opportunities
+                            </h4>
+                            <div id="nearby-savings-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- JS populated -->
+                            </div>
+                        </div>
+
+                        <!-- Results List (Will render search result cards) -->
+                        <div id="search-results-list" style="display: flex; flex-direction: column; gap: var(--space-4); margin-top: var(--space-4);">
+                            <!-- Dynamic flight cards populated here -->
+                        </div>
+
+                        <div class="table-container" style="display: none;">
+                            <table id="search-results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Price</th>
+                                        <th>Dates & Duration</th>
+                                        <th>Airlines & Stops</th>
+                                        <th>Value Score</th>
+                                        <th>AI Forecast</th>
+                                        <th>Booking</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- JS populated fallback -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab Content: Price History / Analytics -->
+            <section id="work-analytics" class="workspace-tab-content">
+                <div class="table-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: var(--space-5);">
+                        <div>
+                            <h3 style="font-family: var(--font-display); font-size: 1.25rem;">Price Trends & Scans</h3>
+                            <span class="sidebar__badge" id="selected-route-badge" style="background: rgba(0,212,255,0.1); color: var(--cyan-500);">Select a Route</span>
+                        </div>
+                        <div class="route-select-wrapper">
+                            <select id="route-selector" class="form-input">
+                                <option value="">Loading routes...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceTrendChart"></canvas>
+                        <div id="chart-placeholder" class="chart-placeholder">
+                            <p>Select a route from the dropdown to visualize price history</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saved Data Table -->
+                <div class="table-card" style="margin-top: 24px;">
+                    <div style="margin-bottom: var(--space-4);">
+                        <h3 style="font-family: var(--font-display); font-size: 1.25rem;">Detailed Flight Records</h3>
+                        <p class="subtitle" style="color: var(--text-secondary); font-size: 0.8rem;">Stored historical results for the selected route.</p>
+                    </div>
+                    <div class="table-container">
+                        <table id="flights-table">
+                            <thead>
+                                <tr>
+                                    <th>Airline</th>
+                                    <th>Dates</th>
+                                    <th>Price</th>
+                                    <th>Stops</th>
+                                    <th>Duration</th>
+                                    <th>Scanned At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6" class="text-center">Select a route above to load historical scans</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab Content: Alerts Manager -->
+            <section id="work-alerts" class="workspace-tab-content">
+                <div class="grid grid-2">
+                    <!-- Create Price Alert Card -->
+                    <div class="glass-card">
+                        <div style="margin-bottom: var(--space-4);">
+                            <h3 style="font-family: var(--font-display); font-size: 1.25rem;">Configure Target Tracker</h3>
+                            <p class="subtitle" style="color: var(--text-secondary); font-size: 0.8rem;">The background agent checks rates hourly against this budget limit.</p>
+                        </div>
+                        <form id="alert-form" class="vertical-form">
+                            <div class="form-group">
+                                <label class="input-label" for="alert-origin">Origin Airport</label>
+                                <div class="airport-field-wrapper">
+                                    <input type="text" id="alert-origin" class="form-input" placeholder="Type city or airport code..." required autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="input-label" for="alert-dest">Destination Airport</label>
+                                <div class="airport-field-wrapper">
+                                    <input type="text" id="alert-dest" class="form-input" placeholder="Type city or airport code..." required autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="input-label" for="alert-start">Start Date</label>
+                                    <input type="date" id="alert-start" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="input-label" for="alert-end">End Date</label>
+                                    <input type="date" id="alert-end" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="input-label" for="alert-duration">Duration (Days)</label>
+                                    <input type="number" id="alert-duration" class="form-input" value="7" min="1" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="input-label" for="alert-target">Target Price (INR)</label>
+                                    <input type="number" id="alert-target" class="form-input" placeholder="e.g., 15000" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">🔔 Create Active Tracker</button>
+                        </form>
+                    </div>
+
+                    <!-- Active Price Trackers List -->
+                    <div class="glass-card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                            <div>
+                                <h3 style="font-family: var(--font-display); font-size: 1.25rem;">Active Price Trackers</h3>
+                                <p class="subtitle" style="color: var(--text-secondary); font-size: 0.8rem;">Configured routes currently active or triggered.</p>
+                            </div>
+                            <button id="btn-trigger-alerts" class="btn btn-secondary" onclick="scanAlerts()" style="height: 36px; padding: 0 var(--space-3); font-size: 0.8rem;">
+                                🔄 Scan Alerts
+                            </button>
+                        </div>
+                        <div class="alerts-list" id="alerts-list-container">
+                            <p class="text-center text-muted">No alerts set yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <h3>SKYTRACER</h3>
+            <p class="text-muted" style="color: var(--text-secondary); margin: 10px 0 20px;">The best flight deal is the one you never miss.</p>
+            <p class="text-muted" style="color: var(--text-tertiary); font-size: 13px;">© 2026 SkyTracer. Self-hosted. Open source. Zero cookies or tracking.</p>
+        </div>
+    </footer>
+
+    <script src="/app.js"></script>
+</body>
+</html>
